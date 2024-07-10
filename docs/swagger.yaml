@@ -1,0 +1,208 @@
+basePath: /
+definitions:
+  entity.Client:
+    properties:
+      client_name:
+        type: string
+      exchange_name:
+        type: string
+      label:
+        type: string
+      pair:
+        type: string
+    type: object
+  entity.DepthOrder:
+    properties:
+      base_qty:
+        type: number
+      price:
+        type: number
+    type: object
+  entity.HistoryOrder:
+    properties:
+      algorithm_name_placed:
+        type: string
+      base_qty:
+        type: number
+      client_name:
+        type: string
+      commission_quote_qty:
+        type: number
+      exchange_name:
+        type: string
+      highest_buy_prc:
+        type: number
+      label:
+        type: string
+      lowest_sell_prc:
+        type: number
+      pair:
+        type: string
+      price:
+        type: number
+      side:
+        type: string
+      time_placed:
+        type: string
+      type:
+        type: string
+    type: object
+  entity.OrderBook:
+    properties:
+      asks:
+        items:
+          $ref: '#/definitions/entity.DepthOrder'
+        type: array
+      bids:
+        items:
+          $ref: '#/definitions/entity.DepthOrder'
+        type: array
+      exchange:
+        type: string
+      id:
+        type: integer
+      pair:
+        type: string
+    type: object
+  entity.OrderBookRequest:
+    properties:
+      exchange:
+        type: string
+      pair:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: This is a sample server for managing orders.
+  title: swagger Order Management API
+  version: "1.0"
+paths:
+  /orderbook:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the order book for a specific exchange and trading pair.
+      parameters:
+      - description: Order Book Request
+        in: body
+        name: orderBookRequest
+        required: true
+        schema:
+          $ref: '#/definitions/entity.OrderBookRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.OrderBook'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+      summary: Get Order Book
+      tags:
+      - order
+    post:
+      consumes:
+      - application/json
+      description: Save a new order book entry.
+      parameters:
+      - description: Order Books
+        in: body
+        name: orderBooks
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/entity.OrderBook'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Save Order Book
+      tags:
+      - order
+  /orderhistory:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the order history for a specific client.
+      parameters:
+      - description: Client
+        in: body
+        name: client
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Client'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.HistoryOrder'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get Order History
+      tags:
+      - order
+    post:
+      consumes:
+      - application/json
+      description: Save a new history order entry.
+      parameters:
+      - description: History Order
+        in: body
+        name: historyOrder
+        required: true
+        schema:
+          $ref: '#/definitions/entity.HistoryOrder'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Save Order History
+      tags:
+      - order
+swagger: "2.0"

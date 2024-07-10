@@ -1,0 +1,22 @@
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+  app:
+    build: .
+    container_name: go_app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - clickhouse
+    env_file:
+      - .env
+    command: ["sh", "-c", "while ! nc -z clickhouse 9000; do sleep 1; done; ./main"]
+
+volumes:
+  clickhouse_data:
