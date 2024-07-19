@@ -35,6 +35,7 @@ func NewController(repo repository.OrderRepository, svc service.OrderService) Or
 // @Success 200 {array} entity.OrderBook
 // @Failure 400 {string} string "Bad Request"
 // @Failure 404 {string} string "Not Found"
+// @Failure 500 {string} string "Internal Server Error"
 // @Router /orderbook [get]
 func (c *orderControllerImpl) GetOrderBookHandler(w http.ResponseWriter, r *http.Request) {
 	var req entity.OrderBookRequest
@@ -45,7 +46,11 @@ func (c *orderControllerImpl) GetOrderBookHandler(w http.ResponseWriter, r *http
 
 	ob, err := c.svc.GetOrderBook(req.Exchange_name, req.Pair)
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+		if err == gorm.ErrRecordNotFound {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
@@ -100,11 +105,11 @@ func (c *orderControllerImpl) GetOrderHistoryHandler(w http.ResponseWriter, r *h
 	}
 
 	ho, err := c.svc.GetOrderHistory(req)
-	if err == gorm.ErrRecordNotFound {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

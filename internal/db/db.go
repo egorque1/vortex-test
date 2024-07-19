@@ -40,7 +40,7 @@ func Connect(env string) (*gorm.DB, error) {
 
 func Migrate(db *gorm.DB) error {
 	orderBooksTable := `
-		CREATE TABLE IF NOT EXISTS order_books (
+		CREATE TABLE IF NOT EXISTS order_book_dtos (
 			id Int64,
 			exchange String,
 			pair String,
